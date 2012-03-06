@@ -1,0 +1,41 @@
+From 949a7110f5a389e7554b6d3b9bdfa262954b1669 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Mon, 1 Nov 2010 16:16:20 +0100
+Subject: [PATCH 1/2] Install spice-vdagentd in /usr/sbin not /sbin
+
+Now that it is no longer launched by a udev rule it does not need to be in
+/sbin.
+---
+ Makefile          |    2 +-
+ spice-vdagentd.sh |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 5a67890..0f3586e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ VERSION = 0.6.3
+ 
+ DESTDIR	?= 
+-sbindir	?= /sbin
++sbindir	?= /usr/sbin
+ bindir	?= /usr/bin
+ initdir	?= /etc/rc.d/init.d
+ xdgautostartdir ?= /etc/xdg/autostart
+diff --git a/spice-vdagentd.sh b/spice-vdagentd.sh
+index 7037b42..0a62c2b 100644
+--- a/spice-vdagentd.sh
++++ b/spice-vdagentd.sh
+@@ -24,7 +24,7 @@
+ # Source function library.
+ . /etc/rc.d/init.d/functions
+ 
+-exec="/sbin/spice-vdagentd"
++exec="/usr/sbin/spice-vdagentd"
+ prog="spice-vdagentd"
+ port="/dev/virtio-ports/com.redhat.spice.0"
+ 
+-- 
+1.7.3.1
+

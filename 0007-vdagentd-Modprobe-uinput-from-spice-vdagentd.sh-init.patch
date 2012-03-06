@@ -1,0 +1,25 @@
+From 172b0dfa400f2b929b514123a0af767f74416184 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Thu, 17 Mar 2011 12:52:12 +0100
+Subject: [PATCH 1/3] vdagentd: Modprobe uinput from spice-vdagentd.sh initscript (rhbz#688257)
+
+uinput may be a module and it does not autoload properly on all systems
+---
+ spice-vdagentd.sh |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/spice-vdagentd.sh b/spice-vdagentd.sh
+index f901398..306de6b 100644
+--- a/spice-vdagentd.sh
++++ b/spice-vdagentd.sh
+@@ -36,6 +36,7 @@ lockfile=/var/lock/subsys/$prog
+ start() {
+     [ -x $exec ] || exit 5
+     [ -c $port ] || exit 0
++    modprobe uinput > /dev/null 2>&1
+     # In case the previous running vdagentd crashed
+     rm -f /var/run/spice-vdagentd/spice-vdagent-sock
+     echo -n $"Starting $prog: "
+-- 
+1.7.3.2
+

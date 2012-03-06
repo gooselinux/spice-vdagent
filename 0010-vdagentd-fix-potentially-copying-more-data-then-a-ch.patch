@@ -1,0 +1,26 @@
+From 0ec3622a1b26f8d8048e614d37ac9e8bf4276cbe Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Wed, 23 Mar 2011 19:17:32 +0100
+Subject: [linux-vdagent PATCH 10/13] vdagentd: fix potentially copying more data then a chunk holds when reading the header
+
+---
+ vdagent-virtio-port.c |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/vdagent-virtio-port.c b/vdagent-virtio-port.c
+index 961b62c..a4411e5 100644
+--- a/vdagent-virtio-port.c
++++ b/vdagent-virtio-port.c
+@@ -204,6 +204,9 @@ static void vdagent_virtio_port_do_chunk(struct vdagent_virtio_port **portp)
+ 
+     if (port->message_header_read < sizeof(port->message_header)) {
+         read = sizeof(port->message_header) - port->message_header_read;
++        if (read > port->chunk_header.size) {
++            read = port->chunk_header.size;
++        }
+         memcpy((uint8_t *)&port->message_header + port->message_header_read,
+                port->chunk_data, read);
+         port->message_header_read += read;
+-- 
+1.7.3.2
+

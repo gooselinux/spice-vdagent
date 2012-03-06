@@ -1,0 +1,27 @@
+From 1d9465f8822f3e241c8c22c862c873e37b49fb1b Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Mon, 8 Nov 2010 22:48:16 +0100
+Subject: [PATCH] sysv initscript: fix lsb header multi line description
+
+---
+ spice-vdagentd.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/spice-vdagentd.sh b/spice-vdagentd.sh
+index a74bb63..119a61a 100644
+--- a/spice-vdagentd.sh
++++ b/spice-vdagentd.sh
+@@ -17,8 +17,8 @@
+ # Default-Stop: 0 1 2 3 4 6
+ # Short-Description: Agent daemon for Spice guests
+ # Description: Together with a per X-session agent process the spice agent
+-# daemon enhances the spice guest user experience with client
+-# mouse mode, guest <-> client copy and paste support and more.
++#	daemon enhances the spice guest user experience with client
++#	mouse mode, guest <-> client copy and paste support and more.
+ ### END INIT INFO
+ 
+ # Source function library.
+-- 
+1.7.3.2
+

@@ -1,0 +1,28 @@
+From aca540ccae12fbc5194410accd71a5ab384473ce Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Mon, 7 Mar 2011 14:59:56 +0100
+Subject: [PATCH] Allow changing the resolution through the agent on multi monitor setups
+
+Rather then refusing to use the monitor config send by the client at
+all for multi monitor clients, simply take the info from the first monitor.
+---
+ vdagent-x11.c |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/vdagent-x11.c b/vdagent-x11.c
+index 11e9c45..2bf5cd1 100644
+--- a/vdagent-x11.c
++++ b/vdagent-x11.c
+@@ -805,8 +805,7 @@ void vdagent_x11_set_monitor_config(struct vdagent_x11 *x11,
+ 
+     if (mon_config->num_of_monitors != 1) {
+         fprintf(x11->errfile,
+-                "Only 1 monitor supported, ignoring monitor config\n");
+-        return;
++                "Only 1 monitor supported, ignoring additional monitors\n");
+     }
+ 
+     sizes = XRRSizes(x11->display, x11->screen, &num_sizes);
+-- 
+1.7.3.2
+

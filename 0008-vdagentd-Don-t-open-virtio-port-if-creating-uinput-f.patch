@@ -1,0 +1,26 @@
+From d64c3ebb1034a14ff28a895d89ca074830c47255 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Thu, 17 Mar 2011 12:54:37 +0100
+Subject: [PATCH 2/3] vdagentd: Don't open virtio port if creating uinput fails
+
+There is little use in opening the virtio port when uinput creation has failed,
+since we will exit as soon as control is returned back to the main loop.
+---
+ vdagentd.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/vdagentd.c b/vdagentd.c
+index 9b2e4f3..f5a2e75 100644
+--- a/vdagentd.c
++++ b/vdagentd.c
+@@ -362,6 +362,7 @@ static void check_xorg_resolution(void) {
+             fprintf(logfile, "Fatal uinput error\n");
+             retval = 1;
+             quit = 1;
++            return;
+         }
+ 
+         if (!virtio_port) {
+-- 
+1.7.3.2
+

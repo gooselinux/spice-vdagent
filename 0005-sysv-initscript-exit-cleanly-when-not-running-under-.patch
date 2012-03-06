@@ -1,0 +1,28 @@
+From a167b3f8945d07137c98d4ee6c2d512d5bc0cdbd Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Mon, 10 Jan 2011 19:31:35 +0100
+Subject: [PATCH] sysv initscript: exit cleanly when not running under spice
+
+Exit with an exit code of 0 (iow everything ok), rather then 6 (lsb:
+program not configured) when started while not running under a spice
+enabled vm.
+---
+ spice-vdagentd.sh |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/spice-vdagentd.sh b/spice-vdagentd.sh
+index 1ff2015..f901398 100644
+--- a/spice-vdagentd.sh
++++ b/spice-vdagentd.sh
+@@ -35,7 +35,7 @@ lockfile=/var/lock/subsys/$prog
+ 
+ start() {
+     [ -x $exec ] || exit 5
+-    [ -c $port ] || exit 6
++    [ -c $port ] || exit 0
+     # In case the previous running vdagentd crashed
+     rm -f /var/run/spice-vdagentd/spice-vdagent-sock
+     echo -n $"Starting $prog: "
+-- 
+1.7.3.2
+

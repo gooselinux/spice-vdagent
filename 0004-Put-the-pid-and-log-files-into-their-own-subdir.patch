@@ -1,0 +1,91 @@
+From 1fe607610ae2f7477d22784c8bf28453df25efbc Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Fri, 19 Nov 2010 11:52:47 +0100
+Subject: [PATCH] Put the pid and log files into their own subdir
+
+This makes it easier to write an selinux policy for spice-vdagent and allows
+for adding extra logfiles / sockets in the future without needing a policy
+change.
+---
+ Makefile          |    2 ++
+ spice-vdagentd.sh |    7 ++++---
+ vdagentd.c        |    4 ++--
+ 3 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 0f3586e..3c5d8c9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -7,6 +7,7 @@ initdir	?= /etc/rc.d/init.d
+ xdgautostartdir ?= /etc/xdg/autostart
+ gdmautostartdir ?= /usr/share/gdm/autostart/LoginWindow
+ socketdir ?= /var/run/spice-vdagentd
++logdir ?= /var/log/spice-vdagentd
+ 
+ CFLAGS	 ?= -O2 -g -Wall
+ CPPFLAGS  = $(shell pkg-config --cflags spice-protocol)
+@@ -21,6 +22,7 @@ install: build
+ 	install -d $(DESTDIR)$(bindir)
+ 	install -d $(DESTDIR)$(sbindir)
+ 	install -d $(DESTDIR)$(socketdir)
++	install -d $(DESTDIR)$(logdir)
+ 	install -p -m 755 spice-vdagent $(DESTDIR)$(bindir)
+ 	install -p -m 755 spice-vdagentd $(DESTDIR)$(sbindir)
+ 	install -d $(DESTDIR)$(initdir)
+diff --git a/spice-vdagentd.sh b/spice-vdagentd.sh
+index 119a61a..1ff2015 100644
+--- a/spice-vdagentd.sh
++++ b/spice-vdagentd.sh
+@@ -27,6 +27,7 @@
+ exec="/usr/sbin/spice-vdagentd"
+ prog="spice-vdagentd"
+ port="/dev/virtio-ports/com.redhat.spice.0"
++pid="/var/run/spice-vdagentd/spice-vdagentd.pid"
+ 
+ [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+ 
+@@ -38,7 +39,7 @@ start() {
+     # In case the previous running vdagentd crashed
+     rm -f /var/run/spice-vdagentd/spice-vdagent-sock
+     echo -n $"Starting $prog: "
+-    daemon $exec $SPICE_VDAGENTD_EXTRA_ARGS
++    daemon --pidfile $pid $exec $SPICE_VDAGENTD_EXTRA_ARGS
+     retval=$?
+     echo
+     [ $retval -eq 0 ] && touch $lockfile
+@@ -47,7 +48,7 @@ start() {
+ 
+ stop() {
+     echo -n $"Stopping $prog: "
+-    killproc $prog
++    killproc -p $pid $prog
+     retval=$?
+     echo
+     [ $retval -eq 0 ] && rm -f $lockfile
+@@ -69,7 +70,7 @@ force_reload() {
+ 
+ rh_status() {
+     # run checks to determine if the service is running or use generic status
+-    status $prog
++    status -p $pid $prog
+ }
+ 
+ rh_status_q() {
+diff --git a/vdagentd.c b/vdagentd.c
+index 47ec963..0215c78 100644
+--- a/vdagentd.c
++++ b/vdagentd.c
+@@ -45,8 +45,8 @@ struct agent_data {
+ };
+ 
+ /* variables */
+-static const char *logfilename = "/var/log/spice-vdagentd.log";
+-static const char *pidfilename = "/var/run/spice-vdagentd.pid";
++static const char *logfilename = "/var/log/spice-vdagentd/spice-vdagentd.log";
++static const char *pidfilename = "/var/run/spice-vdagentd/spice-vdagentd.pid";
+ static const char *portdev = "/dev/virtio-ports/com.redhat.spice.0";
+ static const char *uinput_device = "/dev/uinput";
+ static int debug = 0;
+-- 
+1.7.3.2
+

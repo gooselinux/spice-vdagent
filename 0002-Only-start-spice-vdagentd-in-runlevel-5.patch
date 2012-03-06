@@ -1,0 +1,28 @@
+From c337c0b89c23395679accd8e24dea703fc21aa66 Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Mon, 1 Nov 2010 16:17:20 +0100
+Subject: [PATCH 2/2] Only start spice-vdagentd in runlevel 5
+
+Having it in runlevels without X is not useful
+---
+ spice-vdagentd.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/spice-vdagentd.sh b/spice-vdagentd.sh
+index 0a62c2b..a74bb63 100644
+--- a/spice-vdagentd.sh
++++ b/spice-vdagentd.sh
+@@ -13,8 +13,8 @@
+ # Required-Stop: $local_fs messagebus
+ # Should-Start: $local_fs messagebus
+ # Should-Stop: $local_fs messagebus
+-# Default-Start: 2 3 4 5
+-# Default-Stop: 0 1 6
++# Default-Start: 5
++# Default-Stop: 0 1 2 3 4 6
+ # Short-Description: Agent daemon for Spice guests
+ # Description: Together with a per X-session agent process the spice agent
+ # daemon enhances the spice guest user experience with client
+-- 
+1.7.3.1
+

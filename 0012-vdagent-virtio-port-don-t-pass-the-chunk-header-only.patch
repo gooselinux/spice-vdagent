@@ -1,0 +1,65 @@
+From bddc471e1b43e8f30f52e8bd9054f145a19206af Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Wed, 23 Mar 2011 19:34:42 +0100
+Subject: [linux-vdagent PATCH 12/13] vdagent-virtio-port: don't pass the chunk header, only the chunk port nr
+
+Don't pass the chunk header, only the chunk port nr, to the read callback,
+the size part of the chunk header is irrelavant, esp. as the entire
+vdagent message could have been divided over multiple chunks.
+---
+ vdagent-virtio-port.c |    2 +-
+ vdagent-virtio-port.h |    2 +-
+ vdagentd.c            |    4 ++--
+ 3 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/vdagent-virtio-port.c b/vdagent-virtio-port.c
+index 0b723f8..06c18ec 100644
+--- a/vdagent-virtio-port.c
++++ b/vdagent-virtio-port.c
+@@ -243,7 +243,7 @@ static void vdagent_virtio_port_do_chunk(struct vdagent_virtio_port **vportp)
+ 
+         if (vport->message_data_pos == vport->message_header.size) {
+             if (vport->read_callback) {
+-                int r = vport->read_callback(vport, &vport->chunk_header,
++                int r = vport->read_callback(vport, vport->chunk_header.port,
+                                  &vport->message_header, vport->message_data);
+                 if (r == -1) {
+                     vdagent_virtio_port_destroy(vportp);
+diff --git a/vdagent-virtio-port.h b/vdagent-virtio-port.h
+index 1242e94..db446a1 100644
+--- a/vdagent-virtio-port.h
++++ b/vdagent-virtio-port.h
+@@ -36,7 +36,7 @@ struct vdagent_virtio_port;
+    in other cases return 0. */
+ typedef int (*vdagent_virtio_port_read_callback)(
+     struct vdagent_virtio_port *vport,
+-    VDIChunkHeader *chunk_header,
++    int port_nr,
+     VDAgentMessage *message_header,
+     uint8_t *data);
+ 
+diff --git a/vdagentd.c b/vdagentd.c
+index 8bc79e6..a88bdf5 100644
+--- a/vdagentd.c
++++ b/vdagentd.c
+@@ -194,7 +194,7 @@ static void do_client_clipboard(struct vdagent_virtio_port *vport,
+ 
+ int virtio_port_read_complete(
+         struct vdagent_virtio_port *vport,
+-        VDIChunkHeader *chunk_header,
++        int port_nr,
+         VDAgentMessage *message_header,
+         uint8_t *data)
+ {
+@@ -229,7 +229,7 @@ int virtio_port_read_complete(
+     case VD_AGENT_MONITORS_CONFIG:
+         if (message_header->size < sizeof(VDAgentMonitorsConfig))
+             goto size_error;
+-        do_client_monitors(vport, chunk_header->port, message_header,
++        do_client_monitors(vport, port_nr, message_header,
+                     (VDAgentMonitorsConfig *)data);
+         break;
+     case VD_AGENT_ANNOUNCE_CAPABILITIES:
+-- 
+1.7.3.2
+
